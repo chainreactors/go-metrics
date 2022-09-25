@@ -230,7 +230,7 @@ type meterArbiter struct {
 	ticker  *time.Ticker
 }
 
-var arbiter = meterArbiter{ticker: time.NewTicker(5e9), meters: make(map[*StandardMeter]struct{})}
+var arbiter = meterArbiter{ticker: time.NewTicker(1e9), meters: make(map[*StandardMeter]struct{})}
 
 // Ticks meters on the scheduled interval
 func (ma *meterArbiter) tick() {
