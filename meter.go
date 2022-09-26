@@ -203,9 +203,9 @@ func (m *StandardMeter) Snapshot() Meter {
 }
 
 func (m *StandardMeter) updateSnapshot() {
-	rate1 := math.Float64bits(m.a1.Rate())
-	rate5 := math.Float64bits(m.a5.Rate())
-	rate15 := math.Float64bits(m.a15.Rate())
+	rate1 := math.Float64bits(m.a1.Rate() * float64(5000/RefreshRate))
+	rate5 := math.Float64bits(m.a5.Rate() * float64(5000/RefreshRate))
+	rate15 := math.Float64bits(m.a15.Rate() * float64(5000/RefreshRate))
 	rateMean := math.Float64bits(float64(m.Count()) / time.Since(m.startTime).Seconds())
 
 	atomic.StoreUint64(&m.snapshot.rate1, rate1)
@@ -230,7 +230,8 @@ type meterArbiter struct {
 	ticker  *time.Ticker
 }
 
-var arbiter = meterArbiter{ticker: time.NewTicker(1e9), meters: make(map[*StandardMeter]struct{})}
+var RefreshRate = 1000
+var arbiter = meterArbiter{ticker: time.NewTicker(time.Duration(RefreshRate) * time.Millisecond), meters: make(map[*StandardMeter]struct{})}
 
 // Ticks meters on the scheduled interval
 func (ma *meterArbiter) tick() {
